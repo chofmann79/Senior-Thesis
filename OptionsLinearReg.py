@@ -15,19 +15,23 @@ print(cleaned_strikes)
 print(cleaned_calls)
 print(cleaned_puts)
 
+#Calculate (call minus put) as per Shimko
 price_diff = [a - b for a, b in zip(cleaned_calls, cleaned_puts)]
 
+#Initialize dataframe for the price differential 'X'
 price_diff = pd.DataFrame(price_diff)
 
+#Initialize dataframe for the strikes 'y'
 strikes = pd.DataFrame(cleaned_strikes)
 
+#Run regression of X on y
 X = price_diff.values.reshape(-1, 1)
 y = strikes.values.reshape(-1, 1)
 
 model = LinearRegression()
 model.fit(X, y)
 
-# Step 6: Output intercept, slope, and R^2
+#Output intercept, slope, and R^2
 intercept = model.intercept_[0]
 slope = model.coef_[0][0]
 r_squared = r2_score(y, model.predict(X))
