@@ -20,7 +20,7 @@ import math
 import statistics
 from scipy.interpolate import interp1d
 
-
+#Load polynomial coefficients from OptionsQuadraticCurve.py
 a, b, c = coefficients
 
 def fitted_volatilities(a, b, c, K):
@@ -33,6 +33,7 @@ def black_scholes_call(S, K, T, r, sigma):
     call_price = S * np.exp(-r * T) * norm.cdf(d1) - K * np.exp(-r * T) * norm.cdf(d2)
     return call_price
 
+#Interpolate strikes and differentiate as per Shimko
 def interpolation_function(T, r, C, delta, K):
     K_plus = K + delta
     K_minus = K - delta
@@ -73,14 +74,8 @@ implied_probabilities = []
 for C, K in zip(call_option_prices, strike_price_list):
     g = interpolation_function(time_to_expiry, interest_rate_differential, C, delta, K)
     implied_probabilities.append(g)
-    
-converted_strikes = []
-for i in strike_price_list:
-    new_strike = 10000 / i
-    converted_strikes.append(new_strike)
 
-implied_probabilities_reversed = list(reversed(implied_probabilities))
-
+#Check that the total probability is equal (or close) to one
 total_prob = sum(implied_probabilities) * delta
 implied_probabilities = [p / total_prob for p in implied_probabilities]
 
@@ -134,33 +129,7 @@ for K, P in zip(strike_price_list, implied_probabilities):
 kurtoses_2 = sum(kurtoses) / ((variances_2 ** 2))
 print("Kurtosis:", kurtoses_2)
 
-# Example lists
-pdf_values = implied_probabilities  # Replace with your list of PDF values
-strikes = strike_price_list     # Replace with your list of corresponding strikes
-
-# Ensure the lists are numpy arrays for easier manipulation
-pdf_values = np.array(pdf_values)
-strikes = np.array(strikes)
-
-# Step 1: Calculate the cumulative distribution function (CDF)
-cdf_values = np.cumsum(pdf_values) * np.diff(strikes, prepend=strikes[0])  # Approximate the CDF using cumulative sum
-
-# Normalize the CDF to ensure it sums to 1
-cdf_values /= cdf_values[-1]
-
-# Step 2: Interpolate the CDF to find the 10th and 90th percentiles
-cdf_interp = interp1d(cdf_values, strikes, kind='linear', bounds_error=False, fill_value='extrapolate')
-
-# Find the percentiles
-percentile_10 = cdf_interp(0.10)
-percentile_90 = cdf_interp(0.90)
-percentile_50 = cdf_interp(0.50)
-
-# Output results
-print(f"10th Percentile: {percentile_10}")
-print(f"90th Percentile: {percentile_90}")
-print(f"50th Percentile: {percentile_50}")
-
+#Output strikes and implied risk-neutral densities
 print(strike_price_list)
 print(implied_probabilities)
 
