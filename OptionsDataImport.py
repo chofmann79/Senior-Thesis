@@ -10,10 +10,13 @@ import pandas as pd
 from datetime import datetime, timedelta
 import math
 
+#Set the date from which you would like to pull options data.
 date = datetime(2022, 12, 20)
 
+#Set the expiry of the options for which you would like data.
 expiry_date = date + timedelta(days=90)
 
+#Pull other relevant data 
 bsd = pd.read_excel("BlackScholes Data.xlsx")
 bsd.set_index(bsd.columns[0], inplace=True)
 bsd.index = pd.to_datetime(bsd.index)
@@ -21,7 +24,7 @@ interest_rate_diff = bsd.loc[date, "Interest Rate Differential"]
 underlying = 10000 / bsd.loc[date, "USDJPY"]
 forward_rate = bsd.loc[date, "Forward Rate"]
 
-
+#Selects the correct month's excel file
 if expiry_date.month == 1:
     file = "JADF.xlsx"
 elif expiry_date.month == 2:
@@ -46,7 +49,8 @@ elif expiry_date.month == 11:
     file = "JADX.xlsx"
 elif expiry_date.month == 12:
     file = "JADZ.xlsx"
-    
+
+#Selects the correct year tab within the chosen excel file
 if expiry_date.year == 2017:
     sheet_name = file.replace(".xlsx", "") + "7"
 elif expiry_date.year == 2018:
